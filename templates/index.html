@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 text-white mb-4">
+                    Smart Parking Detection System
+                </h1>
+                <p class="lead text-white mb-4">
+                    Upload your parking lot video and get real-time analysis of available parking spots using advanced computer vision and machine learning.
+                </p>
+                <a href="/upload" class="btn btn-primary btn-lg">
+                    <i class="fas fa-upload"></i> Start Analysis
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <i class="fas fa-parking feature-icon text-white"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center p-4">
+                <i class="fas fa-video feature-icon"></i>
+                <h4 class="text-white mb-3">Video Analysis</h4>
+                <p class="text-white">
+                    Upload parking lot videos in various formats (MP4, AVI, MOV) for automated analysis.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center p-4">
+                <i class="fas fa-eye feature-icon"></i>
+                <h4 class="text-white mb-3">Real-time Detection</h4>
+                <p class="text-white">
+                    Advanced computer vision algorithms detect and track parking spot occupancy in real-time.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center p-4">
+                <i class="fas fa-chart-bar feature-icon"></i>
+                <h4 class="text-white mb-3">Detailed Analytics</h4>
+                <p class="text-white">
+                    Get comprehensive statistics including occupancy rates and available spot counts.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

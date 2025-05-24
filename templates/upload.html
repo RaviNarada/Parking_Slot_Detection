@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Video - Parking Detection{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card p-5">
+                <h2 class="text-white text-center mb-4">
+                    <i class="fas fa-cloud-upload-alt"></i> Upload Parking Media
+                </h2>
+
+                <div id="system-status" class="alert alert-info">
+                    <i class="fas fa-spinner fa-spin"></i> Checking system status...
+                </div>
+
+                <form id="upload-form" enctype="multipart/form-data" style="display: none;">
+                    <div class="mb-4">
+                        <label for="video-file" class="form-label text-white">
+                            <i class="fas fa-file-video"></i> Select Video/Image File
+                        </label>
+                        <input type="file" class="form-control" id="video-file" name="file" 
+                               accept=".mp4,.avi,.mov,.mkv,.jpg,.jpeg,.png" required>
+                        <div class="form-text text-white-50">
+                            Supported formats: MP4, AVI, MOV, MKV, JPG, PNG (Max size: 100MB)
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-play"></i> Process File
+                        </button>
+                    </div>
+                </form>
+
+                <div id="progress-container" style="display: none;">
+                    <div class="text-center mb-3">
+                        <h5 class="text-white">Processing...</h5>
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div id="results-container" style="display: none;">
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-check-circle"></i> Analysis Complete!</h5>
+                        <div id="results-summary"></div>
+                    </div>
+
+                    <div class="row" id="stats-row"></div>
+
+                    <div class="mt-4">
+                        <h5 class="text-white mb-3">Processed Output</h5>
+                        <div id="frames-container" class="row"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/status')
+        .then(response => response.json())
+        .then(data => {
+            const statusDiv = document.getElementById('system-status');
+            const uploadForm = document.getElementById('upload-form');
+            if (data.model_loaded && data.mask_loaded && data.parking_spots_detected > 0) {
+                statusDiv.className = 'alert alert-success';
+                statusDiv.innerHTML = `<i class="fas fa-check-circle"></i> System Ready - ${data.parking_spots_detected} parking spots detected`;
+                uploadForm.style.display = 'block';
+            } else {
+                statusDiv.className = 'alert alert-danger';
+                statusDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> System not ready. Please check model and mask files.`;
+            }
+        })
+        .catch(error => console.error('Error checking system status:', error));
+
+    document.getElementById('upload-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fileInput = document.getElementById('video-file');
+        const file = fileInput.files[0];
+        if (!file) return alert('Please select a file');
+
+        document.getElementById('upload-form').style.display = 'none';
+        document.getElementById('progress-container').style.display = 'block';
+
+        const formData = new FormData();
+        formData.append('file', file);
+        const endpoint = file.type.startsWith('image/') ? '/process-image' : '/process-video';
+
+        fetch(endpoint, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('progress-container').style.display = 'none';
+            if (data.success) displayResults(data, file.type.startsWith('image/'));
+            else {
+                alert('Error: ' + (data.error || 'Unknown error occurred'));
+                document.getElementById('upload-form').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('progress-container').style.display = 'none';
+            alert('Error processing file');
+            document.getElementById('upload-form').style.display = 'block';
+        });
+    });
+
+    function displayResults(data, isImage = false) {
+        document.getElementById('results-summary').innerHTML = `
+            <p><strong>Analysis completed successfully!</strong></p>
+            ${data.frames_processed ? `<p>Processed ${data.frames_processed} frames from your video.</p>` : ''}
+        `;
+
+        document.getElementById('stats-row').innerHTML = `
+            <div class="col-md-3 mb-3"><div class="card text-center p-3"><h3 class="text-primary">${data.total_spots}</h3><p class="text-white mb-0">Total Spots</p></div></div>
+            <div class="col-md-3 mb-3"><div class="card text-center p-3"><h3 class="text-success">${data.available_spots}</h3><p class="text-white mb-0">Available</p></div></div>
+            <div class="col-md-3 mb-3"><div class="card text-center p-3"><h3 class="text-danger">${data.occupied_spots}</h3><p class="text-white mb-0">Occupied</p></div></div>
+            <div class="col-md-3 mb-3"><div class="card text-center p-3"><h3 class="text-warning">${data.occupancy_rate}%</h3><p class="text-white mb-0">Occupancy</p></div></div>
+        `;
+
+        const framesContainer = document.getElementById('frames-container');
+        if (isImage) {
+            framesContainer.innerHTML = `
+                <div class="col-md-6 offset-md-3">
+                    <div class="card">
+                        <img src="data:image/jpeg;base64,${data.processed_image}" class="card-img-top" alt="Processed Image">
+                        <div class="card-body text-center">
+                            <small class="text-white">Analyzed Image</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            framesContainer.innerHTML = data.processed_frames.map((frame, index) => `
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card">
+                        <img src="data:image/jpeg;base64,${frame.base64}" class="card-img-top" alt="Frame ${index + 1}">
+                        <div class="card-body text-center">
+                            <small class="text-white">Frame ${index + 1}</small><br>
+                            <a href="/static/output/frames/${frame.filename}" class="btn btn-sm btn-outline-light mt-2" download>
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');    
+
+        }
+
+        document.getElementById('results-container').style.display = 'block';
+    }
+});
+</script>
+{% endblock %}

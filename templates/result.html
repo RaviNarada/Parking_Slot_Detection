@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Parking Detection{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card p-4">
+
+                <h2 class="text-white text-center mb-4">
+                    <i class="fas fa-chart-line"></i> Analysis Results
+                </h2>
+                
+                <div class="text-center">
+                    <p class="text-white lead">
+                        Your analysis results will appear here after processing a video.
+                    </p>
+                    <a href="/upload" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Upload New Video
+                    </a>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="/download-results" class="btn btn-success me-2">
+                        <i class="fas fa-file-download"></i> Download CSV Report
+                    </a>
+                    
+                    <!-- <a href="/static/output/frames" class="btn btn-info" download>
+                        <i class="fas fa-image"></i> View Saved Frames
+                    </a> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
