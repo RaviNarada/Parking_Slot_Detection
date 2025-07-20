@@ -19,7 +19,7 @@ The repository appears to follow a structured approach (exact structure may vary
 
 Parking_Slot_Detection/  
 ├── datasets/                # Contains training & testing datasets  
-├── models/                  # Pre-trained models (if any)  
+├── models/                  # Pre-trained models 
 ├── scripts/                 # Utility scripts for processing  
 ├── src/                     # Main source code for detection  
 ├── README.md                # Project documentation  
@@ -29,9 +29,11 @@ Python (Primary programming language)
 
 OpenCV (Image processing & contour detection)
 
+The Scikit-Learn package is used for model training with an SVC as the Training model
+
 Deep Learning Frameworks (Possibly TensorFlow/PyTorch for object detection)
 
-YOLO/SSD (If real-time detection is implemented)
+YOLO/SSD (If real-time detection is implemented) --- Future Enhancement
 
 🚀 Potential Applications
 Smart Cities – Automated parking management.
