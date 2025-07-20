@@ -3,7 +3,6 @@
 The main aim of this task is to detect the parking slots automatically
 to help the parking owners to know about the status of parking area.
 
-<!-- [![Watch the video](https://img.youtube.com/vi/F-884J2mnOY/0.jpg)](https://www.youtube.com/watch?v=F-884J2mnOY) -->
 📌 Introduction
 This repository contains a Parking Slot Detection system, which is an essential component of smart parking solutions. The project likely leverages computer vision and deep learning techniques to identify and mark available parking spaces in real-time or from images/videos.
 
